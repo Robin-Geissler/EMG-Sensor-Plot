@@ -1,103 +1,101 @@
-# This is a sample Python script.
-
-# Press Umschalt+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import statistics as stat
-import time
-from scipy.fft import fft, fftfreq
 
-window_size = 50000
 
-data_i = ['value1','value2','value3','value4','value5','value6','value7','value8']
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Strg+F8 to toggle the breakpoint.
-
+# Colum names
+data_i = ['value1', 'value2', 'value3', 'value4', 'value5', 'value6', 'value7', 'value8']
 
 
 def read_data():
-    data = pd.read_csv('E:\LOG.CSV', sep=';')
+    # Read the CSV file into a DataFrame with ';' as the separator
+    data = pd.read_csv('D:\LOG.CSV', sep=';')
+
+    # Convert 'timestamp' column to datetime objects using the specified format
     data['timestamp'] = pd.to_datetime(data['timestamp'], format='%H-%M-%S-%f')
+
+    # Set the 'timestamp' column as the index of the DataFrame
     data.set_index('timestamp', inplace=True)
+
     return data
 
+
 def offset_data(data):
-    for i, value_i in enumerate(data_i, start=1):
+    # Iterate over all channels
+   for i, value_i in enumerate(data_i, start=1):
+       # Calculate the mean of the current column
         offset = stat.mean(data[value_i])
+       # Offset the measurement data
         data[value_i] = data[value_i] - offset
 
+
 def scale_data(data):
+    # Iterate over all channels
     for i, value_i in enumerate(data_i, start=1):
-        data[value_i] = data[value_i] * (4500 / 16777216)
+        # Scale the values with a factor of: V_ADC / 2^24 bit / A
+        data[value_i] = data[value_i] * (9000 / 16777216 / 24)
+
+
 def plot_data(timestamp, data, plotName):
+    # Create a new figure
     fig_data = plt.figure(figsize=(20, 12))
-    ax = fig_data.add_subplot(1, 1, 1)  # hier größe festlegen
+    # Add a single subplot to the figure
+    ax = fig_data.add_subplot(1, 1, 1)
+    # Plot the data against timestamps
     ax.plot(timestamp, data)
+    # Set the title of the plot
     ax.set_title(plotName)
+    # Label the x-axis
     ax.set_xlabel('Time')
+    # Label the y-axis
     ax.set_ylabel('EMG')
+    # Set the limits for the y-axis
+    ax.set_ylim(-10.3, 10.3)
+    # Display the plot
     fig_data.show()
 
-def plot_all_data( data):
+
+def plot_all_data(data):
+    # Create a new figure
     fig_data = plt.figure()
 
-
+    # Iterate over all channels
     for i, value_i in enumerate(data_i, start=1):
+        # Add a subplot to the figure in an 8-row grid
         ax = fig_data.add_subplot(8, 1, i)
+        # Plot channel data
         ax.plot(data.index, data[value_i])
-
+        # Label the x-axis
         ax.set_xlabel('Time')
+        # Label the y-axis with the channel number
         ax.set_ylabel('Channel ' + str(i))
+        # Set the y-axis limits
+        ax.set_ylim(-10.3, 10.3)
 
+    # Align subplot labels
+    fig_data.align_labels()
+    # Display the figure with all subplots
     fig_data.show()
 
-def plot_rms(timestamp, data):
-    s = data ** 2
-    ms = s.rolling(window=window_size).mean()
-    rms = ms ** 0.5
-
-    fig_rms = plt.figure(figsize=(20, 12))
-    ax = fig_rms.add_subplot(1, 1, 1)  # hier größe festlegen
-
-    ax.plot(timestamp, rms, 'b' )
-    ax.set_title('RMS')
-    ax.set_xlabel('Time')
-    ax.set_ylabel('RMS')
-    fig_rms.show()
-
-def plot_mean_freq(data,fs):
-    global mean_freq
-    mean_freq_arr = []
-    for i in range(len(data['value']) - 50):
-        spec = np.abs(np.fft.rfft(data['value'][i:(i+49)]))
-        freq = np.fft.rfftfreq(len(data['value'][i:(i+49)]), d=1 / fs)
-        amp = spec / spec.sum()
-        mean_freq = (freq * amp).sum()
-        mean_freq_arr.append(mean_freq)
-
-    for i in range(50):
-        mean_freq_arr.append(0)
-
-    data['mean_freq'] = mean_freq_arr
-    fig_mean_freq = plt.figure(figsize=(20, 12))
-    ax = fig_mean_freq.add_subplot(1, 1, 1)  # hier größe festlegen
-    ax.plot(data.index, data['mean_freq'])
-    ax.set_title('Mean Frequency')
-    ax.set_xlabel('Time')
-    ax.set_ylabel('Mean Freq')
-    fig_mean_freq.show()
 
 
-# Press the green button in the gutter to run the script.
+
+
+
+
+
+
+
+"""" main function plots measurement data for 8 EMG channels"""
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    # Read and preprocess data from CSV
     data = read_data()
+    # Offset the data
     offset_data(data)
+    # Scale the data
     scale_data(data)
+
+    # Plot EMG channels in individual figures
     plot_data(data.index, data['value1'], 'EMG Channel 1')
     plot_data(data.index, data['value2'], 'EMG Channel 2')
     plot_data(data.index, data['value3'], 'EMG Channel 3')
@@ -106,7 +104,9 @@ if __name__ == '__main__':
     plot_data(data.index, data['value6'], 'EMG Channel 6')
     plot_data(data.index, data['value7'], 'EMG Channel 7')
     plot_data(data.index, data['value8'], 'EMG Channel 8')
-    plot_all_data( data)
-    plot_rms(data.index, data['value1'])
-    #plot_mean_freq(data, 1000)
+
+    # Plot all channels in a single figure
+    plot_all_data(data)
+
+    # Display all plots
     plt.show()
