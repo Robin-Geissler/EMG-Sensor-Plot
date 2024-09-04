@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import statistics as stat
 
+FILE_LOCATION = 'D:\LOG.CSV'
 
 # Colum names
 data_i = ['value1', 'value2', 'value3', 'value4', 'value5', 'value6', 'value7', 'value8']
@@ -9,7 +10,7 @@ data_i = ['value1', 'value2', 'value3', 'value4', 'value5', 'value6', 'value7', 
 
 def read_data():
     # Read the CSV file into a DataFrame with ';' as the separator
-    data = pd.read_csv('D:\LOG.CSV', sep=';')
+    data = pd.read_csv(FILE_LOCATION, sep=';')
 
     # Convert 'timestamp' column to datetime objects using the specified format
     data['timestamp'] = pd.to_datetime(data['timestamp'], format='%H-%M-%S-%f')
