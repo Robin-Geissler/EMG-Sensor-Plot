@@ -1,6 +1,6 @@
 # EMG Evaluation Plot
 
-This is a script for visualization of EMG data after a mesurement. It is to be used together with this multichannel EMG sensor: [Multichannel EMG Sensor](./../../../../emg-sensor_board)  
+This is a script for visualization of EMG data after a mesurement. It is to be used together with this multichannel EMG sensor: [Multichannel EMG Sensor](https://github.com/Robin-Geissler/EMG-Sensor-Board)  
 
 This script visualizes 8 channels simultaneously, and can easily be extended to more channels.
 ![Visualization](Figures/plot.PNG "Vizualisation")
